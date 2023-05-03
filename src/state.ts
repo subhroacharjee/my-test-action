@@ -16,13 +16,16 @@ interface UpdateStatePayload {
 // 	state: string
 // }
 
-// type PRStatus =
+// type PullRequestEvents =
 //   | 'opened'
 //   | 'closed'
 //   | 'reopened'
 //   | 'review_requested'
 //   | 'review_request_removed'
 //   | 'merged'
+//   | 'edited'
+
+// type ChangeRequestedEvents = 'submited' | 'edited'
 // type NotionState = 'no'
 
 function MapPRStateToNotionState(): string {
