@@ -54,7 +54,7 @@ function run() {
             core.info([webhook, token].join(' '));
             const context = github.context;
             core.info(context.eventName);
-            core.info(Object.keys(event).join(' '));
+            core.info(event.action);
         }
         catch (error) {
             if (error instanceof Error)

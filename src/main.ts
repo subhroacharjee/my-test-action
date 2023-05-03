@@ -16,7 +16,7 @@ async function run(): Promise<void> {
 
     const context = github.context
     core.info(context.eventName)
-    core.info(Object.keys(event).join(' '))
+    core.info(event.action)
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
