@@ -42,6 +42,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 function run() {
+    var _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // const webhook = core.getInput('webook', {
@@ -51,14 +52,23 @@ function run() {
                 required: true
             });
             const event = JSON.parse(core.getInput('event'));
-            const octokit = github.getOctokit(token);
+            const ghEvent = {
+                action: event.action,
+                owner: github.context.repo.owner,
+                name: github.context.repo.repo,
+                pr: event.pull_request.number,
+                merged: event.pull_request.merged,
+                body: event.pull_request.body,
+                reviewState: (_a = event.review) === null || _a === void 0 ? void 0 : _a.state
+            };
             const gqlVariables = {
                 owner: github.context.repo.owner,
                 name: github.context.repo.repo,
                 pr: event.pull_request.number
             };
-            core.info(event.action);
-            core.info(JSON.stringify(event));
+            const octokit = github.getOctokit(token);
+            core.info(github.context.eventName);
+            core.info(JSON.stringify(ghEvent));
             const result = yield octokit.graphql(`query($owner: String!, $name: String!, $pr: Int!) {
       repository(owner: $owner, name: $name) {
         pullRequest(number: $pr) {
