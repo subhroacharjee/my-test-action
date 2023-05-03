@@ -28,7 +28,7 @@ async function run(): Promise<void> {
       pr: event.pull_request.number
     }
 
-    core.info(github.context.action)
+    core.info(event.action)
     core.info(JSON.stringify(event.pull_request))
     const result: RepositoryResponse = await octokit.graphql(
       `query($owner: String!, $name: String!, $pr: Int!) {

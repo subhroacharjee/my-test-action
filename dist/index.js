@@ -57,7 +57,7 @@ function run() {
                 name: github.context.repo.repo,
                 pr: event.pull_request.number
             };
-            core.info(github.context.action);
+            core.info(event.action);
             core.info(JSON.stringify(event.pull_request));
             const result = yield octokit.graphql(`query($owner: String!, $name: String!, $pr: Int!) {
       repository(owner: $owner, name: $name) {

@@ -9,7 +9,12 @@ interface UpdateStatePayload {
   issues: Issue[]
 }
 
-// interface PullRequest {}
+// interface PullRequest {
+// 	body?: string,
+// 	merged: boolean,
+// 	number: number,
+// 	state: string
+// }
 
 // type PRStatus =
 //   | 'opened'
