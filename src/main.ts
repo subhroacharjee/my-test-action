@@ -1,14 +1,23 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
+interface RepositoryResponse {
+  repository: {
+    pullRequest: {
+      closingIssuesReferences: {
+        nodes: {body: string}[]
+      }
+    }
+  }
+}
 
 async function run(): Promise<void> {
   try {
     // const webhook = core.getInput('webook', {
-    //   required: false
+    //   required: true
     // })
 
     const token = core.getInput('token', {
-      required: false
+      required: true
     })
 
     const event = JSON.parse(core.getInput('event'))
@@ -19,8 +28,9 @@ async function run(): Promise<void> {
       pr: event.pull_request.number
     }
 
-    core.info(JSON.stringify(gqlVariables))
-    const result = await octokit.graphql(
+    core.info(github.context.action)
+    core.info(JSON.stringify(event.pull_request))
+    const result: RepositoryResponse = await octokit.graphql(
       `query($owner: String!, $name: String!, $pr: Int!) {
       repository(owner: $owner, name: $name) {
         pullRequest(number: $pr) {
@@ -36,7 +46,7 @@ async function run(): Promise<void> {
       gqlVariables
     )
 
-    core.info(JSON.stringify(result))
+    core.debug(JSON.stringify(result))
   } catch (error) {
     core.info(JSON.stringify(error))
     if (error instanceof Error) core.setFailed(error.message)

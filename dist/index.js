@@ -45,10 +45,10 @@ function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             // const webhook = core.getInput('webook', {
-            //   required: false
+            //   required: true
             // })
             const token = core.getInput('token', {
-                required: false
+                required: true
             });
             const event = JSON.parse(core.getInput('event'));
             const octokit = github.getOctokit(token);
@@ -57,7 +57,8 @@ function run() {
                 name: github.context.repo.repo,
                 pr: event.pull_request.number
             };
-            core.info(JSON.stringify(gqlVariables));
+            core.info(github.context.action);
+            core.info(JSON.stringify(event.pull_request));
             const result = yield octokit.graphql(`query($owner: String!, $name: String!, $pr: Int!) {
       repository(owner: $owner, name: $name) {
         pullRequest(number: $pr) {
@@ -70,7 +71,7 @@ function run() {
       }
     }
     `, gqlVariables);
-            core.info(JSON.stringify(result));
+            core.debug(JSON.stringify(result));
         }
         catch (error) {
             core.info(JSON.stringify(error));
