@@ -21,7 +21,7 @@ async function run(): Promise<void> {
 
     core.info(JSON.stringify(gqlVariables))
     const result = await octokit.graphql(
-      `query($owner: String, $name: String, $pr: Int) {
+      `query($owner: String!, $name: String!, $pr: Int!) {
       repository(owner: $owner, name: $name) {
         pullRequest(number: $pr) {
           closingIssuesReferences(first: 10) {
@@ -38,6 +38,7 @@ async function run(): Promise<void> {
 
     core.info(JSON.stringify(result))
   } catch (error) {
+    core.info(JSON.stringify(error))
     if (error instanceof Error) core.setFailed(error.message)
   }
 }

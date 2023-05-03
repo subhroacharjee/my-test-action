@@ -58,7 +58,7 @@ function run() {
                 $pr: event.pull_request.number
             };
             core.info(JSON.stringify(gqlVariables));
-            const result = yield octokit.graphql(`query($owner: String, $name: String, $pr: Int) {
+            const result = yield octokit.graphql(`query($owner: String!, $name: String!, $pr: Int!) {
       repository(owner: $owner, name: $name) {
         pullRequest(number: $pr) {
           closingIssuesReferences(first: 10) {
@@ -73,6 +73,7 @@ function run() {
             core.info(JSON.stringify(result));
         }
         catch (error) {
+            core.info(JSON.stringify(error));
             if (error instanceof Error)
                 core.setFailed(error.message);
         }
