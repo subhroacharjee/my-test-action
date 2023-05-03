@@ -1,16 +1,22 @@
 import * as core from '@actions/core'
-import {wait} from './wait'
+import * as github from '@actions/github'
 
 async function run(): Promise<void> {
   try {
-    const ms: string = core.getInput('milliseconds')
-    core.debug(`Waiting ${ms} milliseconds ...`) // debug is only output if you set the secret `ACTIONS_STEP_DEBUG` to true
+    const webhook = core.getInput('webook', {
+      required: false
+    })
 
-    core.debug(new Date().toTimeString())
-    await wait(parseInt(ms, 10))
-    core.debug(new Date().toTimeString())
+    const token = core.getInput('token', {
+      required: false
+    })
 
-    core.setOutput('time', new Date().toTimeString())
+    const event = JSON.parse(core.getInput('event'))
+    core.info([webhook, token].join(' '))
+
+    const context = github.context
+    core.info(context.eventName)
+    core.info(Object.keys(event).join(' '))
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }

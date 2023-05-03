@@ -1,11 +1,16 @@
-name: 'Your name here'
+name: 'test-action'
 description: 'Provide a description here'
-author: 'Your name or organization here'
+author: 'subhroacharjee'
 inputs:
-  milliseconds: # change this
-    required: true
+  webhook: # change this
+    required: false
     description: 'input description here'
-    default: 'default value if applicable'
+  token:
+    required: false
+    description: ''
+  event:
+    required: false
+    description: ''
 runs:
   using: 'node16'
   main: 'dist/index.js'
