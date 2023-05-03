@@ -1,5 +1,15 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
+
+// type Action =
+//   | 'opened'
+//   | 'closed'
+//   | 'reopened'
+//   | 'review_requested'
+//   | 'submitted'
+//   | 'edited'
+// type State = 'merged' | 'approved'
+
 interface RepositoryResponse {
   repository: {
     pullRequest: {
@@ -29,8 +39,7 @@ async function run(): Promise<void> {
     }
 
     core.info(event.action)
-    if (event.action === 'submitted')
-      core.info(JSON.stringify(event.review.state))
+    core.info(JSON.stringify(event))
     const result: RepositoryResponse = await octokit.graphql(
       `query($owner: String!, $name: String!, $pr: Int!) {
       repository(owner: $owner, name: $name) {
