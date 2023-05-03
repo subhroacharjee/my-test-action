@@ -29,7 +29,8 @@ async function run(): Promise<void> {
     }
 
     core.info(event.action)
-    core.info(JSON.stringify(event.review.state))
+    if (event.action === 'submitted')
+      core.info(JSON.stringify(event.review.state))
     const result: RepositoryResponse = await octokit.graphql(
       `query($owner: String!, $name: String!, $pr: Int!) {
       repository(owner: $owner, name: $name) {

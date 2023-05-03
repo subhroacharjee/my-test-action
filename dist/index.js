@@ -58,7 +58,8 @@ function run() {
                 pr: event.pull_request.number
             };
             core.info(event.action);
-            core.info(JSON.stringify(event.review.state));
+            if (event.action === 'submitted')
+                core.info(JSON.stringify(event.review.state));
             const result = yield octokit.graphql(`query($owner: String!, $name: String!, $pr: Int!) {
       repository(owner: $owner, name: $name) {
         pullRequest(number: $pr) {
