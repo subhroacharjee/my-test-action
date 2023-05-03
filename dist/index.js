@@ -50,7 +50,7 @@ function run() {
             //   required: false
             // })
             const event = JSON.parse(core.getInput('event'));
-            core.info(JSON.stringify(event));
+            core.info(JSON.stringify(Object.keys(event.pull_request)));
         }
         catch (error) {
             if (error instanceof Error)

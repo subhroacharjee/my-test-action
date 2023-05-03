@@ -11,7 +11,7 @@ async function run(): Promise<void> {
     // })
 
     const event = JSON.parse(core.getInput('event'))
-    core.info(JSON.stringify(event))
+    core.info(JSON.stringify(Object.keys(event.pull_request)))
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
