@@ -1,4 +1,5 @@
 import * as core from '@actions/core'
+import * as github from '@actions/github'
 
 async function run(): Promise<void> {
   try {
@@ -6,12 +7,35 @@ async function run(): Promise<void> {
     //   required: false
     // })
 
-    // const token = core.getInput('token', {
-    //   required: false
-    // })
+    const token = core.getInput('token', {
+      required: false
+    })
 
     const event = JSON.parse(core.getInput('event'))
-    core.info(JSON.stringify(Object.keys(event.pull_request)))
+    const octokit = github.getOctokit(token)
+
+    const result = await octokit.graphql(
+      `
+    query($owner: String!, $name: String!, $pr: Int!) {
+      repository(owner: $owner, name: $name) {
+        pullRequest(number: $pr) {
+          closingIssuesReferences(first: 10) {
+            nodes {
+              body
+            }
+          }
+        }
+      }
+    }
+    `,
+      {
+        $owner: github.context.repo.owner,
+        $name: github.context.repo.repo,
+        $pr: event.pull_request.number
+      }
+    )
+
+    core.info(JSON.stringify(result))
   } catch (error) {
     if (error instanceof Error) core.setFailed(error.message)
   }
