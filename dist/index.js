@@ -53,9 +53,9 @@ function run() {
             const event = JSON.parse(core.getInput('event'));
             const octokit = github.getOctokit(token);
             const gqlVariables = {
-                $owner: github.context.repo.owner,
-                $name: github.context.repo.repo,
-                $pr: event.pull_request.number
+                owner: github.context.repo.owner,
+                name: github.context.repo.repo,
+                pr: event.pull_request.number
             };
             core.info(JSON.stringify(gqlVariables));
             const result = yield octokit.graphql(`query($owner: String!, $name: String!, $pr: Int!) {
