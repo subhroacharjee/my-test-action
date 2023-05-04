@@ -41,13 +41,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
+const state_1 = __nccwpck_require__(9249);
 function run() {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            // const webhook = core.getInput('webook', {
-            //   required: true
-            // })
+            const webhook = core.getInput('webook', {
+                required: true
+            });
             const token = core.getInput('token', {
                 required: true
             });
@@ -61,15 +62,9 @@ function run() {
                 body: event.pull_request.body,
                 reviewState: (_a = event.review) === null || _a === void 0 ? void 0 : _a.state
             };
-            const gqlVariables = {
-                owner: github.context.repo.owner,
-                name: github.context.repo.repo,
-                pr: event.pull_request.number
-            };
             const octokit = github.getOctokit(token);
-            core.info(github.context.eventName);
-            core.info(JSON.stringify(ghEvent));
-            const result = yield octokit.graphql(`query($owner: String!, $name: String!, $pr: Int!) {
+            const result = yield octokit.graphql(`
+      query($owner: String!, $name: String!, $pr: Int!) {
       repository(owner: $owner, name: $name) {
         pullRequest(number: $pr) {
           closingIssuesReferences(first: 10) {
@@ -80,8 +75,16 @@ function run() {
         }
       }
     }
-    `, gqlVariables);
-            core.debug(JSON.stringify(result));
+    `, {
+                owner: ghEvent.owner,
+                name: ghEvent.name,
+                pr: ghEvent.pr
+            });
+            (0, state_1.updateState)({
+                issues: result.repository.pullRequest.closingIssuesReferences.nodes,
+                event: ghEvent,
+                webhook
+            });
         }
         catch (error) {
             core.info(JSON.stringify(error));
@@ -91,6 +94,61 @@ function run() {
     });
 }
 run();
+
+
+/***/ }),
+
+/***/ 9249:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.updateState = void 0;
+function MapPRStateToNotionState(event) {
+    // unimplemented
+    switch (event.action) {
+        case 'opened':
+        case 'reopened':
+            return 'in-progress';
+        case 'closed': {
+            if (event.merged)
+                return 'for-qa';
+            else
+                return 'archived';
+        }
+        case 'submitted': {
+            if (event.reviewState !== 'approved')
+                return 'fixes-required';
+            else
+                return 'in-progress';
+        }
+        case 'created': {
+            return 'fixes-required';
+        }
+        default:
+            throw new Error('Invalid action');
+    }
+}
+function updateState(payload) {
+    for (const { body } of payload.issues) {
+        if (body.includes('ID:')) {
+            const ID = body.split('ID: ')[1];
+            fetch(payload.webhook, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: ID,
+                    state: MapPRStateToNotionState(payload.event),
+                    pr: payload.event.pr
+                })
+            });
+        }
+    }
+}
+exports.updateState = updateState;
 
 
 /***/ }),

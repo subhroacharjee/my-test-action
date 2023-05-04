@@ -1,39 +1,31 @@
-type Issue = {
-  body: string
-}
+import * as Types from './types'
 
-interface UpdateStatePayload {
-  webhook: string
-  action: string
-  pr: number
-  issues: Issue[]
-}
-
-// interface PullRequest {
-// 	body?: string,
-// 	merged: boolean,
-// 	number: number,
-// 	state: string
-// }
-
-// type PullRequestEvents =
-//   | 'opened'
-//   | 'closed'
-//   | 'reopened'
-//   | 'review_requested'
-//   | 'review_request_removed'
-//   | 'merged'
-//   | 'edited'
-
-// type ChangeRequestedEvents = 'submited' | 'edited'
-// type NotionState = 'no'
-
-function MapPRStateToNotionState(): string {
+function MapPRStateToNotionState(event: Types.GithubEvent): Types.NotionState {
   // unimplemented
-  return 'hello'
+  switch (event.action) {
+    case 'opened':
+    case 'reopened':
+      return 'in-progress'
+
+    case 'closed': {
+      if (event.merged) return 'for-qa'
+      else return 'archived'
+    }
+
+    case 'submitted': {
+      if (event.reviewState !== 'approved') return 'fixes-required'
+      else return 'in-progress'
+    }
+    case 'created': {
+      return 'fixes-required'
+    }
+
+    default:
+      throw new Error('Invalid action')
+  }
 }
 
-export function updateState(payload: UpdateStatePayload): void {
+export function updateState(payload: Types.UpdateStatePayload): void {
   for (const {body} of payload.issues) {
     if (body.includes('ID:')) {
       const ID = body.split('ID: ')[1]
@@ -44,8 +36,8 @@ export function updateState(payload: UpdateStatePayload): void {
         },
         body: JSON.stringify({
           id: ID,
-          state: MapPRStateToNotionState(),
-          pr: payload.pr
+          state: MapPRStateToNotionState(payload.event),
+          pr: payload.event.pr
         })
       })
     }
