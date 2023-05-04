@@ -1,16 +1,16 @@
-name: 'test-action'
+name: 'notion-sync-issue'
 description: 'Provide a description here'
 author: 'subhroacharjee'
 inputs:
-  webhook: # change this
-    required: false
-    description: 'input description here'
+  webhook:
+    required: true
+    description: 'make integrations webhook'
   token:
-    required: false
-    description: ''
+    required: true
+    description: 'private github token'
   event:
-    required: false
-    description: ''
+    required: true
+    description: 'jsonified github event'
 runs:
   using: 'node16'
   main: 'dist/index.js'
