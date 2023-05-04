@@ -46,7 +46,7 @@ function run() {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const webhook = core.getInput('webook', {
+            const webhook = core.getInput('webhook', {
                 required: true
             });
             const token = core.getInput('token', {

@@ -6,7 +6,7 @@ import {updateState} from './state'
 
 async function run(): Promise<void> {
   try {
-    const webhook = core.getInput('webook', {
+    const webhook = core.getInput('webhook', {
       required: true
     })
 
