@@ -1,3 +1,4 @@
+import axios from 'axios'
 import * as Types from './types'
 
 function MapPRStateToNotionState(event: Types.GithubEvent): Types.NotionState {
@@ -25,20 +26,16 @@ function MapPRStateToNotionState(event: Types.GithubEvent): Types.NotionState {
   }
 }
 
-export function updateState(payload: Types.UpdateStatePayload): void {
+export async function updateState(
+  payload: Types.UpdateStatePayload
+): Promise<void> {
   for (const {body} of payload.issues) {
     if (body.includes('ID:')) {
       const ID = body.split('ID: ')[1]
-      fetch(payload.webhook, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          id: ID,
-          state: MapPRStateToNotionState(payload.event),
-          pr: payload.event.pr
-        })
+      await axios.post(payload.webhook, {
+        id: ID,
+        state: MapPRStateToNotionState(payload.event),
+        pr: payload.event.pr
       })
     }
   }

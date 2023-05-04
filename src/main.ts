@@ -48,7 +48,7 @@ async function run(): Promise<void> {
       }
     )
 
-    updateState({
+    await updateState({
       issues: result.repository.pullRequest.closingIssuesReferences.nodes,
       event: ghEvent,
       webhook
